@@ -2,7 +2,7 @@ var path = require('path');
 
 // Postgres DATABASE_URL = postgres://user:passwd@host:port/database
 // SQLite   DATABASE_URL = sqlite://:@:/
-var url = process.env.DATABASE_URL.match(/(.*)\:\/\/(.*?)\:(.*)@(.*)\:(.*)\/(.*)/);
+var url = (process.env.DATABASE_URL || 'sqlite://:@:/').match(/(.*)\:\/\/(.*?)\:(.*)@(.*)\:(.*)\/(.*)/);
 var DB_name  = (url[6]||null);
 var user     = (url[2]||null);
 var pwd      = (url[3]||null);
@@ -10,7 +10,7 @@ var protocol = (url[1]||null);
 var dialect  = (url[1]||null);
 var port     = (url[5]||null);
 var host     = (url[4]||null);
-var storage  = process.env.DATABASE_STORAGE;
+var storage  = process.env.DATABASE_STORAGE || 'sqlite://:@:/';
 
 // Cargar Modelo ORM
 var Sequelize = require('sequelize');
@@ -32,16 +32,16 @@ var Quiz = sequelize.import(path.join(__dirname,'quiz'));
 exports.Quiz = Quiz;  // exportar definición de la tabla Quiz
 
 // sequelize.sync() crea e inicializa tabla de preguntas en DB
-sequelize.sync().success(function() {
+sequelize.sync().then(function() {
 	// success(..) ejecuta el manejador una vez creada la tabla
-	Quiz.count().success(function (count) {
+	Quiz.count().then(function (count) {
 		if(count === 0) {	// la tabla se inicializa sólo si está vacía
 			Quiz.bulkCreate(
-              	[ {pregunta: 'Capital de Italia',   respuesta: 'Roma'},
-                  {pregunta: 'Capital de Portugal', respuesta: 'Lisboa'},
-                  {pregunta: 'Capital de Austria', respuesta: 'Viena'},
-                  {pregunta: 'Capital de Holanda', respuesta: 'Amsterdam'},
-                  {pregunta: 'Capital de Suiza', respuesta: 'Berna'}
+              	[ {pregunta: 'Capital de Italia', respuesta: 'Roma', tema: 'Otro'},
+                  {pregunta: 'Capital de Portugal', respuesta: 'Lisboa', tema: 'Otro'},
+                  {pregunta: 'Capital de Austria', respuesta: 'Viena', tema: 'Otro'},
+                  {pregunta: 'Descubridor de la penicilina', respuesta: 'Alexander Fleming', tema: 'Ciencia'},
+                  {pregunta: 'Descubridor de la neurona', respuesta: 'Santiago Ramon y Cajal', tema: 'Ciencia'}
           		])
 			.then(function(){console.log('Base de datos inicializada')});
 		};
