@@ -25,6 +25,14 @@ exports.index = function(req, res) {
     ).catch(function(error){next(error)});
 };
 
+// exports.index = function(req, res) {  
+// 	models.Quiz.findAll().then(
+//     	function(quizes) {
+//       		res.render('quizes/index.ejs', {quizes: quizes});
+//     	}
+//   	).catch(function(error) { next(error)});
+// };
+
 // GET /quizes/:id
 exports.show = function(req, res) {
 	models.Quiz.find(req.params.quizId).then(function(quiz) {
