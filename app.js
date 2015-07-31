@@ -41,6 +41,28 @@ app.use(function(req, res, next) {
     next();
 });
 
+//Gestion de auto-logout de session (2 minutos)
+app.use(function(req, res, next) {
+    if(req.session.user) {  //Si hay fecha sesion ultima actividad
+        var now = (new Date()).getTime();  //Actual
+        var last = (new Date(req.session.lastAccess)).getTime();  //Ultima
+        var diferencia = now - last
+        var maxDiferencia = 120000; // 2 minutos en milisegundos.
+
+        if (diferencia > maxDiferencia) {  
+            delete req.session.user;   // Eliminar session
+            res.redirect('/login');
+            return;
+        } else {
+            req.session.lastAccess= now;
+            next();
+        }
+    } else {
+        req.session.lastAccess= now;
+        next();
+    }
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
